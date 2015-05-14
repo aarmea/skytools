@@ -33,16 +33,18 @@ def set_tcp_keepalive(fd, keepalive = True,
     """
 
     # usable on this OS?
-    if not hasattr(socket, 'SO_KEEPALIVE') or not hasattr(socket, 'fromfd'):
+    if not hasattr(socket, 'SO_KEEPALIVE'):
         return
 
     # need socket object
     if isinstance(fd, socket.SocketType):
         s = fd
-    else:
+    elif hasattr(socket, 'fromfd'):
         if hasattr(fd, 'fileno'):
             fd = fd.fileno()
         s = socket.fromfd(fd, socket.AF_INET, socket.SOCK_STREAM)
+    else:
+        return
 
     # skip if unix socket
     if type(s.getsockname()) != type(()):
